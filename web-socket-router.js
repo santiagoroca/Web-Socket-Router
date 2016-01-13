@@ -1,4 +1,4 @@
-Router = function (connection, ctx) {
+WebSocketRouter = function (connection, ctx) {
     var events = [];
     var router = this;
 
@@ -85,7 +85,7 @@ Router = function (connection, ctx) {
                 run [i] (data);
             }
         } catch (e) {
-            router.error (this.ExceptionHandler (e));
+            error (router.ExceptionHandler (e));
         }
     }
 
@@ -195,5 +195,5 @@ Router = function (connection, ctx) {
     }
 
     //Due to several version of the router beeing used on different places of the application
-    this.version = '1.1.0';
+    this.version = '1.1.1';
 }
