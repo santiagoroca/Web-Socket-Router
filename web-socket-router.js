@@ -1,6 +1,5 @@
 Router = function (connection, ctx) {
     var events = [];
-    var permissions = {};
     var router = this;
 
     this.action = {
@@ -26,9 +25,7 @@ Router = function (connection, ctx) {
         });
     else
         connection.onmessage = function (message) {
-            console.log (message);
-            if (message.type === 'utf8')
-                dispatch(JSON.parse(message.utf8Data));
+            dispatch(JSON.parse(message.data));
         }
 
     if (connection.on)
@@ -155,8 +152,14 @@ Router = function (connection, ctx) {
         }
     }
 
-    this.message = function (route) {
+    this.message = function () {
         var message = {};
+
+        this.route = function (route) {
+            message.route = route;
+
+            return this;
+        }
 
         this.action = function (action) {
             message.action = action;
@@ -192,5 +195,5 @@ Router = function (connection, ctx) {
     }
 
     //Due to several version of the router beeing used on different places of the application
-    this.version = '1.0.0';
+    this.version = '1.1.0';
 }

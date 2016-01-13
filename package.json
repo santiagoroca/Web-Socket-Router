@@ -1,7 +1,7 @@
 {
   "name": "web-socket-router",
-  "version": "1.0.0",
-  "description": "0.0.1",
+  "version": "1.1.0",
+  "description": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,16 +16,10 @@
     "router",
     "sever"
   ],
-  "author": {
-    "name": "Santiago Roca",
-    "email": "snroca@hotmail.com"
-  },
+  "author": "Santiago Roca <snroca@hotmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/santiiiii/web-socket-router/issues"
   },
-  "homepage": "https://github.com/santiiiii/web-socket-router",
-  "readme": "ERROR: No README data found!",
-  "_id": "web-socket-router@1.0.0",
-  "_from": "web-socket-router@1.0.0"
+  "homepage": "https://github.com/santiiiii/web-socket-router"
 }
