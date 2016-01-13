@@ -1,5 +1,6 @@
-module.exports = function (connection, ctx) {
+Router = function (connection, ctx) {
     var events = [];
+    var permissions = {};
     var router = this;
 
     this.action = {
@@ -25,7 +26,9 @@ module.exports = function (connection, ctx) {
         });
     else
         connection.onmessage = function (message) {
-            dispatch(JSON.parse(message.data));
+            console.log (message);
+            if (message.type === 'utf8')
+                dispatch(JSON.parse(message.utf8Data));
         }
 
     if (connection.on)
@@ -152,14 +155,8 @@ module.exports = function (connection, ctx) {
         }
     }
 
-    this.message = function () {
+    this.message = function (route) {
         var message = {};
-
-        this.route = function (route) {
-            message.route = route;
-
-            return this;
-        }
 
         this.action = function (action) {
             message.action = action;
