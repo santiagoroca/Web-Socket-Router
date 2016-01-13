@@ -1,0 +1,32 @@
+{
+    "name": "OPC-Server",
+    "version": "10.3.1",
+    "description": "OPC Socket Server bridges OPCClient with YouBIM application",
+    "author": "Santiago Roca <snroca@hotmail.com>",
+    "main": "main.js",
+
+    "bin": {
+        "module-name": "./bin/module-name"
+    },
+
+    "scripts": {
+        "start": "npm install && node main"
+    },
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/YouBIM/OPC-Node-API"
+    },
+
+    "dependencies": {
+        "websocket": "1.0.22",
+        "express" : "4.13.3",
+        "body-parser": "1.14.1",
+        "node-rest-client": "1.5.1",
+        "web-socket-router": "1.0.0"
+    },
+
+    "preferGlobal": true,
+    "private": true
+}
+  
