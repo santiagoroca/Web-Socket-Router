@@ -62,9 +62,9 @@ WebSocketRouter = function (connection, ctx) {
     var applyToQueue = function (evt, run) {
         if (evt.fn instanceof Array)
             for (var j = 0; j < evt.fn.length; j++)
-                run.push(evt.fn [j].bind (ctx));
+                run.push(evt.fn [j].bind (evt.fn [j].bind ? evt.fn [j].bind : ctx));
         else
-            run.push(evt.fn.bind (ctx));
+            run.push(evt.fn.bind (evt.fn.bind ? evt.fn.bind : ctx));
     }
 
     var dispatch = function (data) {
@@ -118,7 +118,7 @@ WebSocketRouter = function (connection, ctx) {
 
             this.bind = function (bind) {
                 if (bind)
-                    events [events.indexOf(event)].fn.bind(bind);
+                    events [events.indexOf(event)].bind = bind;
 
                 return this;
             }
