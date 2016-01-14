@@ -115,6 +115,13 @@ WebSocketRouter = function (connection, ctx) {
 
                 return this;
             }
+
+            this.bind = function (bind) {
+                if (bind)
+                    events [events.indexOf(event)].fn.bind(bind);
+
+                return this;
+            }
         }
     }
 
