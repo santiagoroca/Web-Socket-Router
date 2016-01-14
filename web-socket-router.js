@@ -125,11 +125,11 @@ WebSocketRouter = function (connection, ctx) {
         }
     }
 
-    this.delete = function (n, fn, filters) { this.on (n, fn).action (this.action.DELETE).filters (filters); }
-    this.update = function (n, fn, filters) { this.on (n, fn).action (this.action.UPDATE).filters (filters); }
-    this.create = function (n, fn, filters) { this.on (n, fn).action (this.action.CREATE).filters (filters); }
-    this.request = function (n, fn, filters) { this.on (n, fn).action (this.action.REQUEST).filters (filters); }
-    this.subscribe = function (n, fn, filters) { this.on (n, fn).action (this.action.SUBSCRIBE).filters (filters); }
+    this.delete = function (n, fn, filters) { return this.on (n, fn).action (this.action.DELETE).filters (filters); }
+    this.update = function (n, fn, filters) { return this.on (n, fn).action (this.action.UPDATE).filters (filters); }
+    this.create = function (n, fn, filters) { return this.on (n, fn).action (this.action.CREATE).filters (filters); }
+    this.request = function (n, fn, filters) { return this.on (n, fn).action (this.action.REQUEST).filters (filters); }
+    this.subscribe = function (n, fn, filters) { return this.on (n, fn).action (this.action.SUBSCRIBE).filters (filters); }
 
     this.intercept = function (n, fn) {
         events.push ({n: routify(n), fn: fn});
