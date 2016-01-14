@@ -62,9 +62,9 @@ module.exports = function (connection, ctx) {
     var applyToQueue = function (evt, run) {
         if (evt.fn instanceof Array)
             for (var j = 0; j < evt.fn.length; j++)
-                run.push(evt.fn [j].bind (evt.fn [j].bind ? evt.fn [j].bind : ctx));
+                run.push(evt.fn [j].bind (evt.bind ? evt.bind : ctx));
         else
-            run.push(evt.fn.bind (evt.fn.bind ? evt.fn.bind : ctx));
+            run.push(evt.fn.bind (evt.bind ? evt.bind : ctx));
     }
 
     var dispatch = function (data) {
