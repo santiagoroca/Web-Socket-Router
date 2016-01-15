@@ -1,5 +1,6 @@
 WebSocketRouter = function (connection, ctx) {
     var events = [];
+    var lastEvents = [];
     var router = this;
 
     this.action = {
@@ -43,14 +44,14 @@ WebSocketRouter = function (connection, ctx) {
         var isFilterMatching = true;
 
         Object.keys(dataFilters).forEach(function(key) {
-            if (dataFilters [key] != eventFilters [key]) isFilterMatching = false;
+            if (!routify(eventFilters [key].toString ()).exec(dataFilters [key].toString ())) isFilterMatching = false;
         });
 
         return isFilterMatching;
     }
 
     var shouldEventExecute = function (data, evt) {
-        if (data.action && evt.action != data.action)
+        if (!routify (evt.action).exec(data.action))
             return false;
 
         if ((data.filters && !evt.filters) || (!data.filters && evt.filters) || (data.filters && !applyFilters (data.filters, evt.filters)))
@@ -70,9 +71,17 @@ WebSocketRouter = function (connection, ctx) {
     var dispatch = function (data) {
         var run = [];
 
+        //Events
         for (var i = 0; i < events.length; i++) {
             if (shouldEventExecute (data, events [i])) {
                 applyToQueue(events [i], run);
+            }
+        }
+
+        //Execute Last Events
+        for (var i = 0; i < lastEvents.length; i++) {
+            if (shouldEventExecute (data, lastEvents [i])) {
+                applyToQueue(lastEvents [i], run);
             }
         }
 
@@ -97,7 +106,7 @@ WebSocketRouter = function (connection, ctx) {
     }
 
     this.on = function (n, fn) {
-        var event = {n: routify(n), fn: fn};
+        var event = {n: routify(n), fn: fn, action: "*"};
 
         events.push (event);
 
@@ -121,6 +130,12 @@ WebSocketRouter = function (connection, ctx) {
                     events [events.indexOf(event)].bind = bind;
 
                 return this;
+            }
+
+            this.executeLast = function () {
+                lastEvents.push(events [events.indexOf(event)]);
+                delete events [events.indexOf(event)];
+                events.length = events.length - 1;
             }
         }
     }
@@ -160,7 +175,7 @@ WebSocketRouter = function (connection, ctx) {
     }
 
     this.message = function () {
-        var message = {};
+        var message = { route: "*" };
 
         this.route = function (route) {
             message.route = route;

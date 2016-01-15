@@ -13,6 +13,6 @@ module.exports = function (request) {
         sabri: true
     });
 
-    new this.router.message().route('/deleteroute').data({message: 'hola'}).action(this.router.action.DELETE).filters({id: 1}).send();
+    new this.router.message().route('/someroute').data({}).action(this.router.action.DELETE).filters({filter: 1}).send();
 
 }

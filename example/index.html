@@ -1,0 +1,15 @@
+<script src="socket/node_modules/web-socket-router/web-socket-router.js" ></script>
+
+<script>
+
+	var Router = new WebSocketRouter (new WebSocket ('ws://127.0.0.1:9090'), function () {});
+
+	Router.on ('/someroute', function () {
+		console.log ("first");
+	}).filters ({ filter: "*" }).executeLast ();
+
+	Router.on ('/someroute', function () {
+		console.log ('second');
+	}).filters ({ filter: "*"});;
+
+</script>
