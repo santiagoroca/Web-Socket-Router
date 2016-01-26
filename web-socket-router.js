@@ -208,9 +208,7 @@ WebSocketRouter = function (connection, ctx) {
             executeTaks(message, BEFORE);
             connection.send(JSON.stringify(message), onEnd);
             executeTaks(message, AFTER);
-        } catch (err) {
-            this.LOG (err);
-        }
+        } catch (err) {}
     }
 
     var executeTaks = function (data, position) {
@@ -264,5 +262,5 @@ WebSocketRouter = function (connection, ctx) {
     }
 
     //Due to several version of the router beeing used on different places of the application
-    this.version = '1.3.0';
+    this.version = '1.3.1';
 }
