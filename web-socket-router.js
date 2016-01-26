@@ -262,5 +262,5 @@ WebSocketRouter = function (connection, ctx) {
     }
 
     //Due to several version of the router beeing used on different places of the application
-    this.version = '1.3.1';
+    this.version = '1.3.2';
 }

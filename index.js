@@ -1,4 +1,7 @@
 module.exports = function (connection, ctx) {
+    var BEFORE = 'BEFORE';
+    var AFTER = 'AFTER;'
+
     var events = [];
     var lastEvents = [];
 
@@ -68,7 +71,7 @@ module.exports = function (connection, ctx) {
     }
 
     var shouldTaskExecute = function (data, task, position) {
-        if (position == task.position) {
+        if (position != task.position) {
             return false;
         }
 
@@ -169,11 +172,11 @@ module.exports = function (connection, ctx) {
     }
 
     this.beforeSend = function (route, fn) {
-        this.registerSendTask (route, fn, 'BEFORE');
+        this.registerSendTask (route, fn, BEFORE);
     };
 
     this.afterSend = function (route, fn) {
-        this.registerSendTask (route, fn, 'AFTER');
+        this.registerSendTask (route, fn, AFTER);
     };
 
     this.registerSendTask = function (route, fn, position) {
@@ -202,9 +205,9 @@ module.exports = function (connection, ctx) {
 
     var send = function (message) {
         try {
-            executeTaks(message, 'BEFORE');
+            executeTaks(message, BEFORE);
             connection.send(JSON.stringify(message), onEnd);
-            executeTaks('AFTER');
+            executeTaks(message, AFTER);
         } catch (err) {}
     }
 
@@ -259,5 +262,5 @@ module.exports = function (connection, ctx) {
     }
 
     //Due to several version of the router beeing used on different places of the application
-    this.version = '1.3.1';
+    this.version = '1.3.2';
 }
