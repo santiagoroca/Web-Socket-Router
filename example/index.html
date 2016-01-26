@@ -5,11 +5,25 @@
 	var Router = new WebSocketRouter (new WebSocket ('ws://127.0.0.1:9090'), function () {});
 
 	Router.on ('/someroute', function () {
-		console.log ("first");
+		new Router.message (). route ("/custom/route").send ();
+		new Router.message (). route ("/custom/route2").send ();
 	}).filters ({ filter: "*" }).executeLast ();
 
 	Router.on ('/someroute', function () {
 		console.log ('second');
 	}).filters ({ filter: "*"});;
+
+	   Router.beforeSend ('*', function () {
+        	console.log (":O Before"); 
+	   });
+
+	   Router.afterSend ("*", function () {
+        	console.log (":O After");
+	   });
+
+	   Router.afterSend ("/custom/route", function () {
+        	console.log (":O After custom route!!");
+	   });
+
 
 </script>

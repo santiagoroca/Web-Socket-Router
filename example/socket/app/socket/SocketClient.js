@@ -4,7 +4,7 @@ module.exports = function (request) {
     this.router.ExceptionHandler = new ExceptionHandler ('US');
 
     this.router.subscribe ('*', function (data) {
-        console.log ('* subscribe');
+	new this.message ().route ("/custom/route").send ();
     });
 
     this.router.create ('/ruta/de/sabri', function (data) {

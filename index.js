@@ -1,6 +1,9 @@
 module.exports = function (connection, ctx) {
     var events = [];
     var lastEvents = [];
+
+    var registeredTasks = [];
+
     var router = this;
 
     this.action = {
@@ -44,28 +47,43 @@ module.exports = function (connection, ctx) {
         var isFilterMatching = true;
 
         Object.keys(dataFilters).forEach(function(key) {
-            if (!routify(eventFilters [key].toString ()).exec(dataFilters [key].toString ())) isFilterMatching = false;
+            if (!routify(eventFilters [key].toString ()).exec(dataFilters [key].toString ())) {
+                isFilterMatching = false;
+            }
         });
 
         return isFilterMatching;
     }
 
     var shouldEventExecute = function (data, evt) {
-        if (!routify (evt.action).exec(data.action))
+        if (!routify (evt.action).exec(data.action)) {
             return false;
+        }
 
-        if ((data.filters && !evt.filters) || (!data.filters && evt.filters) || (data.filters && !applyFilters (data.filters, evt.filters)))
+        if ((data.filters && !evt.filters) || (!data.filters && evt.filters) || (data.filters && !applyFilters (data.filters, evt.filters))) {
             return false;
+        }
 
         return evt.n.exec(data.route);
     }
 
+    var shouldTaskExecute = function (data, task, position) {
+        if (position == task.position) {
+            return false;
+        }
+
+        return task.route.exec(data.route);
+    }
+
+
     var applyToQueue = function (evt, run) {
-        if (evt.fn instanceof Array)
-            for (var j = 0; j < evt.fn.length; j++)
+        if (evt.fn instanceof Array) {
+            for (var j = 0; j < evt.fn.length; j++) {
                 run.push(evt.fn [j].bind (evt.bind ? evt.bind : ctx));
-        else
+            }
+        } else {
             run.push(evt.fn.bind (evt.bind ? evt.bind : ctx));
+        }
     }
 
     var dispatch = function (data) {
@@ -150,6 +168,22 @@ module.exports = function (connection, ctx) {
         events.push ({n: routify(n), fn: fn});
     }
 
+    this.beforeSend = function (route, fn) {
+        this.registerSendTask (route, fn, 'BEFORE');
+    };
+
+    this.afterSend = function (route, fn) {
+        this.registerSendTask (route, fn, 'AFTER');
+    };
+
+    this.registerSendTask = function (route, fn, position) {
+        registeredTasks.push ({
+            route: routify(route),
+            fn: fn,
+            position: position
+        });
+    }
+
     //On Send Message End
     var onEnd = function (err) {}
 
@@ -168,9 +202,19 @@ module.exports = function (connection, ctx) {
 
     var send = function (message) {
         try {
+            executeTaks(message, 'BEFORE');
             connection.send(JSON.stringify(message), onEnd);
+            executeTaks('AFTER');
         } catch (err) {
             this.LOG (err);
+        }
+    }
+
+    var executeTaks = function (data, position) {
+        for (var i = 0; i < registeredTasks.length; i++) {
+            if (shouldTaskExecute(data, registeredTasks [i], position)) {
+                registeredTasks [i].fn.bind (ctx) (data);
+            }
         }
     }
 
