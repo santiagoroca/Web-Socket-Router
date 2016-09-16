@@ -261,6 +261,19 @@ WebSocketRouter = function (connection, ctx) {
         return connection;
     }
 
+    //Close connections
+    this.close = function () {
+        events = [];
+
+        if (connection.readyState == 1) {
+            connection.close();
+        } else {
+            connection.onopen = function () {
+                connection.close ();
+            }
+        }
+    }
+
     //Due to several version of the router beeing used on different places of the application
     this.version = '1.3.2';
 }
