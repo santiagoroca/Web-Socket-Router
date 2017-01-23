@@ -34,9 +34,12 @@ new webSocketRouterInstance.message().route('/artist').action(webSocketRouterIns
 This way you can define a listener for the route '/artist' with action CREATE.
 
 ```javascript
-webSocketRouterInstance.create('/artist', function (artist) {
-	//Save Artist Data
-});
+webSocketRouterInstance.create('/artist', [
+	function (artist) {
+		//Save Artist Data
+	},
+	artistController.printSaveMessage
+);
 ```
 
 
@@ -45,12 +48,27 @@ webSocketRouterInstance.create('/artist', function (artist) {
 You can also intercept messages to do error checking.
 
 ```javascript
-webSocketRouterInstance.intercetp('*', function (artist) {
+webSocketRouterInstance.intercept('*', function (artist) {
 	if (!artits.id) {
     	throw ('No artist id defined.')
     }
 });
 ```
+
+```javascript
+webSocketRouterInstance.intercept('*', [
+	userController.tokenValidation,
+	userController.userHasPermission
+]);
+```
+
+```javascript
+webSocketRouterInstance.intercept('/artist/delete', [
+	artistController.artistExists,
+	artistController.userHasPermissionOnResource
+]);
+```
+
 
 * Defining filters
 
