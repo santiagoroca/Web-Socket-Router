@@ -6,7 +6,7 @@ This is implementation of websocket to provide a clear way to connecto to and fr
 
 
 
-* #### Creating a new instance of the Web Socket Router
+* Creating a new instance of the Web Socket Router
 
 By creating a new instance of the web socket router and passing to the constructor the built-in-web-socket-instance, you are able to start subscribing and sending messages.
 
@@ -16,12 +16,12 @@ var webSocketRouterInstance = new WebSocketRouter(new WebSocket('ws://domain:por
 
 
 
-* #### Sending messages
+* Sending messages
 
 Using the message object's builder, you cand send messages to/from the server.
 
 ```javascript
-webSocketRouterInstance.message().route('/artist').action(webSocketRouterInstance.action.CREATE).data({
+new webSocketRouterInstance.message().route('/artist').action(webSocketRouterInstance.action.CREATE).data({
 	id: 0,
 	name: 'Pearl Jam'
 }).send();
@@ -29,7 +29,7 @@ webSocketRouterInstance.message().route('/artist').action(webSocketRouterInstanc
 
 
 
-* #### Listening to messages
+* Listening to messages
 
 This way you can define a listener for the route '/artist' with action CREATE.
 
@@ -40,7 +40,7 @@ webSocketRouterInstance.create('/artist', function (artist) {
 ```
 
 
-* #### Routes Interceptors
+* Routes Interceptors
 
 You can also intercept messages to do error checking.
 
@@ -52,7 +52,7 @@ webSocketRouterInstance.intercetp('*', function (artist) {
 });
 ```
 
-* #### Defining filters
+* Defining filters
 
 This way you can define a listener for the route '/artist' with action CREATE filtering by the name Pearl Jam. Filters will apply to any first-child key of the data object. 
 
@@ -64,7 +64,7 @@ webSocketRouterInstance.create('/artist', function (artist) {
 });
 ```
 
-* #### Pre and post message Events
+* Pre and post message Events
 This Way you can define an event before sending any route containing '/artist'.
 
 ```javascript
@@ -81,7 +81,7 @@ webSocketRouterInstance.afterSend('/artist', function (artist) {
 });
 ```
 
-* #### Binding a different context for the listener.
+* Binding a different context for the listener.
 Even when you can defined a default context on the Web Socket Constructor, you can also define a custom execution context for the function.
 
 ```javascript
@@ -89,3 +89,56 @@ webSocketRouterInstance.on('/artist/create', artistController.create).bind(artis
 ```
 
 
+## *The message-builder object.*
+
+Empty message
+```javascript
+new webSocketRouterInstance.message().send();
+```
+
+Empty data to artist on default Action
+```javascript
+new webSocketRouterInstance.message().route('/artist').send();
+```
+
+Custom data to artist with DELETE action
+```javascript
+new webSocketRouterInstance.message().route('/artist').data({
+	id: 1
+}).action(webSocketRouterInstance.action.DELETE).send();
+```
+
+
+Custom data to artist with custom action
+```javascript
+new webSocketRouterInstance.message().route('/artist').data({
+	id: 1
+}).action('myCustomActionName').send();
+```
+
+
+## *Listener Object*
+
+* The message-builder object.
+
+Empty data to artist on default Action - Listener
+```javascript
+new webSocketRouterInstance.on('/artist', function () {
+	//TODO Logic
+});
+```
+
+Custom data to artist with DELETE action - Listener (Delete action its predefined and has a .delete method).
+```javascript
+new webSocketRouterInstance.delete('/artist', function (artist) {
+	//TODO Logic
+}).action(webSocketRouterInstance.action.DELETE);
+```
+
+
+Custom data to artist with custom action - Listener (Custom actions needs to use the .on method and specify the action name).
+```javascript
+new webSocketRouterInstance.delete('/artist', function (artist) {
+	//TODO Logic
+}).action('myCustomAction');
+```
