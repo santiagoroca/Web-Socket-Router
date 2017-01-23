@@ -128,7 +128,7 @@ webSocketRouterInstance.on('/artist', artistController.list);
 
 Custom data to artist with DELETE action - Listener (Delete action its predefined and has a .delete method).
 ```javascript
-webSocketRouterInstance.delete('/artist', artistController.delete).action(webSocketRouterInstance.action.DELETE);
+webSocketRouterInstance.delete('/artist', artistController.delete);
 ```
 
 
