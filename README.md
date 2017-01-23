@@ -123,22 +123,16 @@ new webSocketRouterInstance.message().route('/artist').data({
 
 Empty data to artist on default Action - Listener
 ```javascript
-new webSocketRouterInstance.on('/artist', function () {
-	//TODO Logic
-});
+webSocketRouterInstance.on('/artist', artistController.list);
 ```
 
 Custom data to artist with DELETE action - Listener (Delete action its predefined and has a .delete method).
 ```javascript
-new webSocketRouterInstance.delete('/artist', function (artist) {
-	//TODO Logic
-}).action(webSocketRouterInstance.action.DELETE);
+webSocketRouterInstance.delete('/artist', artistController.delete).action(webSocketRouterInstance.action.DELETE);
 ```
 
 
 Custom data to artist with custom action - Listener (Custom actions needs to use the .on method and specify the action name).
 ```javascript
-new webSocketRouterInstance.delete('/artist', function (artist) {
-	//TODO Logic
-}).action('myCustomAction');
+webSocketRouterInstance.delete('/artist', artistController.delete).action('myCustomAction');
 ```
