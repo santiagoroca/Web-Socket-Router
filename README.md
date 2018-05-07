@@ -2,7 +2,7 @@
 
 Overview
 --------
-This is implementation of websocket to provide a clear way to connecto to and from a websocket server. Providing tools such, methods, routes, and filters.
+This is implementation of websocket to provide a clear way to connect to and from a websocket server. Providing tools such, methods, routes, and filters.
 
 
 
@@ -21,10 +21,14 @@ var webSocketRouterInstance = new WebSocketRouter(new WebSocket('ws://domain:por
 Using the message object's builder, you cand send messages to/from the server.
 
 ```javascript
-new webSocketRouterInstance.message().route('/artist').action(webSocketRouterInstance.action.CREATE).data({
-	id: 0,
-	name: 'Pearl Jam'
-}).send();
+webSocketRouterInstance.message({
+	route: '/artist',
+	action: webSocketRouterInstance.action.CREATE,
+	data: {
+		id: 0,
+		name: 'Pearl Jam'
+	}
+});
 ```
 
 
@@ -72,7 +76,7 @@ webSocketRouterInstance.intercept('/artist/delete', [
 
 * Defining filters
 
-This way you can define a listener for the route '/artist' with action CREATE filtering by the name Pearl Jam. Filters will apply to any first-child key of the data object. 
+This way you can define a listener for the route '/artist' with action CREATE filtering by the name Pearl Jam. Filters will apply to any first-child key of the data object.
 
 ```javascript
 webSocketRouterInstance.create('/artist', function (artist) {
@@ -111,27 +115,31 @@ webSocketRouterInstance.on('/artist/create', artistController.create).bind(artis
 
 Empty message
 ```javascript
-new webSocketRouterInstance.message().send();
+webSocketRouterInstance.message({});
 ```
 
 Empty data to artist on default Action
 ```javascript
-new webSocketRouterInstance.message().route('/artist').send();
+webSocketRouterInstance.message({
+	route: '/artist'
+});
 ```
 
 Custom data to artist with DELETE action
 ```javascript
-new webSocketRouterInstance.message().route('/artist').data({
-	id: 1
-}).action(webSocketRouterInstance.action.DELETE).send();
+webSocketRouterInstance.message({
+	route: '/artist',
+	action: webSocketRouterInstance.action.DELETE
+});
 ```
 
 
 Custom data to artist with custom action
 ```javascript
-new webSocketRouterInstance.message().route('/artist').data({
-	id: 1
-}).action('myCustomActionName').send();
+webSocketRouterInstance.message({
+	route: '/artist',
+	action: 'myCustomActionName'
+});
 ```
 
 
