@@ -227,7 +227,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   *
   */
   Router.prototype.on = function (n, fn) {
-      var event = {n: routify(n), fn: fn, action: "*"};
+      var event = {n: this.routify(n), fn: fn, action: "*"};
       this.events.push (event);
 
       return new function () {
@@ -305,7 +305,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   *
   */
   Router.prototype.intercept = function (n, fn) {
-      this.events.push ({n: routify(n), fn: fn});
+      this.events.push ({n: this.routify(n), fn: fn});
   }
 
 
@@ -361,7 +361,7 @@ var WebSocketRouter = function (connection_query, ctx) {
       var isFilterMatching = true;
 
       Object.keys(dataFilters).forEach(function(key) {
-          if (!routify(eventFilters [key].toString ()).exec(dataFilters [key].toString ())) {
+          if (!this.routify(eventFilters [key].toString ()).exec(dataFilters [key].toString ())) {
               isFilterMatching = false;
           }
       });
@@ -374,7 +374,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   *
   */
   Router.prototype.shouldEventExecute = function (data, evt) {
-      if (!routify (evt.action).exec(data.action)) {
+      if (!this.routify (evt.action).exec(data.action)) {
           return false;
       }
 
@@ -442,10 +442,10 @@ var WebSocketRouter = function (connection_query, ctx) {
   Router.prototype.runner = function (run, data) {
       try {
           for (var i = 0; i < run.length; i++) {
-              this.run [i] (data);
+              run [i] (data);
           }
       } catch (e) {
-          error (this.ExceptionHandler (e));
+          this.ExceptionHandler (e);
       }
   }
 
