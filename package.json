@@ -1,7 +1,7 @@
 {
   "name": "web-socket-router",
-  "version": "1.4.0",
-  "description": "1.4.0",
+  "version": "1.4.1",
+  "description": "1.4.1",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
