@@ -64,19 +64,25 @@ var WebSocketRouter = function (connection_query, ctx) {
 
     // Whenever the new connection is open, the connection
     // Handler will flush the messageQueue
-    this.connection.onopen = this.flush;
+    this.connection.onopen = this.flush.bind(this);
 
     // Whenever the connection is closed, the WS
     // Will try to reconnect up to 10 times.
-    this.connection.onclose = this.reconnect;
+    this.connection.onclose = this.reconnect.bind(this);
 
     // Connection on-message will dispatch all received
     // Messages to the wrapper class. Messages will be dispatched
     // Already parsed
-    this.connection.onmessage = function (message) {
-        this.on_message(JSON.parse(message.data));
-    }
+    this.connection.onmessage = this.dispatch.bind(this);
 
+  }
+
+
+  /*
+  *
+  */
+  ConnectionHandler.prototype.dispatch = function (message) {
+      this.on_message(JSON.parse(message.data));
   }
 
 
@@ -85,7 +91,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   */
   ConnectionHandler.prototype.reconnect = function () {
     if (this.connectionsAttemp < 10) {
-      this.reconnect();
+      this.connect();
     } else {
       console.log(`10 Attemps to connect failed to the server ${this.connection_query}. Is server up?`);
     }
@@ -131,8 +137,7 @@ var WebSocketRouter = function (connection_query, ctx) {
     try {
         this.connection.send(JSON.stringify(message));
     } catch (err) {
-        this.messageQueue.push(send);
-        //console.log(err);
+        this.messageQueue.push(message);
     }
   }
 
@@ -161,7 +166,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   *
   *
   */
-  function Router function (connection_query, ctx) {
+  function Router (connection_query, ctx) {
 
     this.action = {
         UPDATE: 'UPDATE',
@@ -185,7 +190,7 @@ var WebSocketRouter = function (connection_query, ctx) {
 
     // Will manage all connection-related aspects
     // Of the WebSocket
-    this.connection = new ConnectionHandler(connection_query);
+    this.connection = new ConnectionHandler(connection_query, this.dispatch.bind(this));
 
   }
 
@@ -205,7 +210,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   /*
   *
   */
-  Router.prototype.ExceptionHandler = funuction () {
+  Router.prototype.ExceptionHandler = function () {
     return {
         'message': 'NO HANDLER ASOCIATED'
     }
@@ -215,7 +220,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   /*
   *
   */
-  Router.prototype.LOG = funuction () { }
+  Router.prototype.LOG = function () { }
 
 
   /*
@@ -283,7 +288,7 @@ var WebSocketRouter = function (connection_query, ctx) {
   /*
   *
   */
-  Router.prototype.request = function = function (n, fn, filters) {
+  Router.prototype.request = function (n, fn, filters) {
       return this.on (n, fn).action (this.action.REQUEST).filters (filters);
   }
 
@@ -335,36 +340,9 @@ var WebSocketRouter = function (connection_query, ctx) {
   /*
   *
   */
-  Router.prototype.message = function () {
-      var message = { route: "*" };
-
-      this.route = function (route) {
-          message.route = route;
-
-          return this;
-      }
-
-      this.action = function (action) {
-          message.action = action;
-
-          return this;
-      }
-
-      this.data = function (data) {
-          message.data = data;
-
-          return this;
-      }
-
-      this.filters = function (filters) {
-          message.filters = filters;
-
-          return this;
-      }
-
-      this.send = function () {
-          send (message);
-      }
+  Router.prototype.message = function (options) {
+      this.send(Object.assign({ route: "*" }, options));
+      console.log(Object.assign({ route: "*" }, options));
   }
 
 
@@ -441,16 +419,16 @@ var WebSocketRouter = function (connection_query, ctx) {
       var run = [];
 
       //Events
-      for (var i = 0; i < events.length; i++) {
-          if (this.shouldEventExecute (data, events [i])) {
-              this.applyToQueue(events [i], run);
+      for (var i = 0; i < this.events.length; i++) {
+          if (this.shouldEventExecute (data, this.events [i])) {
+              this.applyToQueue(this.events [i], run);
           }
       }
 
       //Execute Last Events
-      for (var i = 0; i < lastEvents.length; i++) {
-          if (this.shouldEventExecute (data, lastEvents [i])) {
-              this.applyToQueue(lastEvents [i], run);
+      for (var i = 0; i < this.lastEvents.length; i++) {
+          if (this.shouldEventExecute (data, this.lastEvents [i])) {
+              this.applyToQueue(this.lastEvents [i], run);
           }
       }
 
@@ -486,17 +464,6 @@ var WebSocketRouter = function (connection_query, ctx) {
   /*
   *
   */
-  Router.prototype.message (route, data) {
-      return JSON.stringify ({
-          route: route,
-          data: data
-      });
-  }
-
-
-  /*
-  *
-  */
   Router.prototype.error = function (error) {
       this.send ({ route: '/socket/error', data: error });
   }
@@ -516,7 +483,3 @@ var WebSocketRouter = function (connection_query, ctx) {
   return new Router(connection_query, ctx);
 
 };
-
-if (module && module.exports) {
-  module.exports = WebSocketRouter;
-}

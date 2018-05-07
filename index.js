@@ -17,9 +17,10 @@ module.exports = function (connection, ctx) {
         REQUEST: 'REQUEST'
     }
 
-    this.ExceptionHandler = function () {
+    this.ExceptionHandler = function (error) {
+        console.log(error);
         return {
-            'message': 'NO HANDLER ASOCIATED'
+            'message': error.stack
         }
     }
 
@@ -27,6 +28,7 @@ module.exports = function (connection, ctx) {
 
     if (connection.on)
         connection.on('message', function (message) {
+          console.log(message);
             if (message.type === 'utf8')
                 dispatch(JSON.parse(message.utf8Data));
         });
@@ -91,6 +93,8 @@ module.exports = function (connection, ctx) {
 
     var dispatch = function (data) {
         var run = [];
+
+        console.log(events);
 
         //Events
         for (var i = 0; i < events.length; i++) {
@@ -204,6 +208,13 @@ module.exports = function (connection, ctx) {
     }
 
     var send = function (message) {
+
+        // If the connection is Closed or on Closing State
+        // Reopen the connection
+        if (connection.readyState == 2 || connection.readyState == 3) {
+          connection
+        }
+
         try {
             executeTaks(message, BEFORE);
             connection.send(JSON.stringify(message), onEnd);
@@ -260,7 +271,7 @@ module.exports = function (connection, ctx) {
     this.getConnection = function () {
         return connection;
     }
-    
+
     //Close connections
     this.close = function () {
         events = [];
