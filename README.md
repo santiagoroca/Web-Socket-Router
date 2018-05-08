@@ -1,4 +1,4 @@
-# *Web Socket Router*
+# *Web Socket Router* [![Build Status](https://travis-ci.org/santiiiii/Web-Socket-Router.svg?branch=master)](https://travis-ci.org/santiiiii/Web-Socket-Router)[![Maintainability](https://api.codeclimate.com/v1/badges/2e2e061da0246d16306d/maintainability)](https://codeclimate.com/github/santiiiii/Web-Socket-Router/maintainability)[![Test Coverage](https://api.codeclimate.com/v1/badges/2e2e061da0246d16306d/test_coverage)](https://codeclimate.com/github/santiiiii/Web-Socket-Router/test_coverage) 
 
 Overview
 --------

@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - '7'
+before_install:
+  - pip install --user codecov
+before_deploy:
+  - webpack
+after_success:
+  - codecov --file coverage/lcov.info --disable search
+deploy:
+  provider: npm
+  email: snroca@hotmail.com
+  api_key:
+    secure: fjiRSBn099WlmcFQyCUZKT4Ff3ljZhxr2uiueK3iVvYKem4CuvGa1McpQfExeG+Urxr3RHWhiCwbG2w6Bhe5IVVGpmEJLC/n+H84yfv6nl9uYAmx6uWPbACYkmC1I3f36IFJbqfKWPOXqB5kB0Ida7J6nVsKHxoHuiEOyToLCuZJw4zoM8G0QxUUI2Nq6trInOTLdW0F1GLIZVWn97vhK1L+feMKDetzwr2Pu44smYrjWZED8BynoO1OecNVxQFFup+pkSRxaKW0yodofqOgxNWBwWNqdMgNHz38aDg9aSVaXh5E/6O7HkzAyjkyGzcC5KJZFiD/bwd6b9vb167DXpy5P51WQemMdL6F6XoSgLo0ErCExcaAsWoBxAMegOXp2Dbk/i2zpR9jA/eaMm9EeqDUVh/6n25XVRNNBnSPTLJIqrpoBsEVCJEK+5fTwxFlX6L1HMn3x9e+/qTkYuKKqUIcDmMSReaAUjQvOwetiG6POsGUOqIwuDN/A8lJiCwmCn1JH9RoR5X8g5nMuaYkrMtBuPJt4C2Kf9tCzERntJDi0VmI3ld4PiMYFXK5TNLhRxHulTO65BgM3sgQMJmm8XVCSpmar6a1N/oX02tIA4O7ssbxIHA67OHQ8XSDnHSGYtZYBpE48gz1rODg7mFYGa8U0IRVBHdXQVhNkiEz1dc=
+branches:
+  only:
+  - master

@@ -17,9 +17,22 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Connection Handler
   *
+  * The connection handler will keep the connection with the server
+  * Established. If the connection is closed the connection handler will
+  * attempt to connect up to a maximum o 10 retries.
+  * Connection handler will also keep a connection queue in which
+  * messages delivered while the connection was closed, closing or opening
+  * will be re-sent as soon as the connection is ready.
   *
-  *
+  * @constructor
+  * @param {String} connection_query
+  *   Defines the FQDM to connect to (eg: ws(s)://localhost:8080)
+  * @param {Function} on_message
+  *   Defines the callback function that will be exectued every time
+  *   a new message is received from the server
+  * @return {ConnectionHandler}
   *
   */
   function ConnectionHandler (connection_query, on_message) {
@@ -49,6 +62,13 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Connect
+  *
+  * Establish the connection with the server and sets the
+  * on* listeners of the websocket object.
+  *
+  * @function
+  * @return {None}
   *
   */
   ConnectionHandler.prototype.connect = function () {
@@ -79,6 +99,12 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Dispatch
+  *
+  * Sends the new arrived message to the provided callback
+  *
+  * @function
+  * @return {None}
   *
   */
   ConnectionHandler.prototype.dispatch = function (message) {
@@ -87,6 +113,13 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Reconnect
+  *
+  * Attempts to reconnect to the server up to ten 10 times.
+  * Logs an error if the maximum retry limit is reached.
+  *
+  * @function
+  * @return {None}
   *
   */
   ConnectionHandler.prototype.reconnect = function () {
@@ -99,6 +132,12 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Flush
+  *
+  * Execute all messages in the Message Queue
+  *
+  * @function
+  * @return {None}
   *
   */
   ConnectionHandler.prototype.flush = function () {
@@ -121,16 +160,15 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Send
   *
-  */
-  ConnectionHandler.prototype.send = function (message) {
-    try {
-        this.connection.send(JSON.stringify(message));
-    } catch (err) { console.log(err); }
-  }
-
-
-  /*
+  * Sends the object as a stringified message to the server
+  * If the connection fails, stores the message in the message Queue
+  *
+  * @function
+  * @param {Object}
+  *   Object containing all the data that will be sent to the server
+  * @return {None}
   *
   */
   ConnectionHandler.prototype.send = function (message) {
@@ -143,6 +181,12 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Close
+  *
+  * Closes the connection and clears all data related to the object
+  *
+  * @function
+  * @return {None}
   *
   */
   Router.prototype.close = function () {
@@ -161,9 +205,24 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Router
   *
+  * Implements a routifier which lets you define URL to your handlers
+  * The URLs will respond to methods and chainable, meaning that a chai
+  * of responsability (by the given order) will be respected.
+  * If one of the handlers, fails, it will break the chain.
+  * Optionally, actions (in a similar fashion to REST) can be defined,
+  * also filters.
+  * You can attach hooks to your url handlers which will let you prepare your
+  * data or scenario before executing a particular task or set of tasks
   *
-  *
+  * @constructor
+  * @param {String} connection_query
+  *   Defines the FQDM to connect to (eg: ws(s)://localhost:8080)
+  * @param {*} ctx
+  *   Defines the root context to which all the Handlers will be attached by
+  *   default, if no other handler is specified
+  * @return {Router}
   *
   */
   function Router (connection_query, ctx) {
@@ -196,6 +255,14 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Send
+  *
+  * Executes the current message, and the BEFORE and AFTER hooks
+  *
+  * @function
+  * @param {Object} message
+  *   Object message to be sent to the server
+  * @return {None}
   *
   */
   Router.prototype.send = function (message) {
@@ -208,22 +275,53 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Exception Handler
+  *
+  * Receives an error and returns a message ready to be
+  * delivered to the client.
+  *
+  * @function
+  * @param {Error} error
+  *   Object message to be sent to the server
+  * @return {None}
   *
   */
-  Router.prototype.ExceptionHandler = function () {
+  Router.prototype.ExceptionHandler = function (error) {
     return {
-        'message': 'NO HANDLER ASOCIATED'
+        'message': error.stack
     }
   }
 
 
   /*
+  * @name On
   *
-  */
-  Router.prototype.LOG = function () { }
-
-
-  /*
+  * Receives a route and a callback and returns a builder object
+  * that will let you define, chainable, action, filters, bind and executeLast,
+  * properties.
+  *
+  * action - receives a constante (or value) and filter also by defined
+  *          action in the server.
+  *
+  * filters - receives an object and filter also by key-values defined in the
+  *           filters, and also present in the received message.
+  *
+  * bind - Receives any object and binds the callback to the specified context.
+  *
+  * executeLast - will push this callback to the end of the event queue, beeing
+  *               making it the last in the chain of responsability.
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.on = function (n, fn) {
@@ -262,6 +360,24 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Delete
+  *
+  * Receives a route, a callback and filters, creates a new listener for
+  * those criterias and the DELETE action
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @param {Object} filters
+  *   Object used to match parameters in the body and filter messages.
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.delete = function (n, fn, filters) {
@@ -270,6 +386,24 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Update
+  *
+  * Receives a route, a callback and filters, creates a new listener for
+  * those criterias and the UPDATE action
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @param {Object} filters
+  *   Object used to match parameters in the body and filter messages.
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.update = function (n, fn, filters) {
@@ -278,6 +412,24 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Create
+  *
+  * Receives a route, a callback and filters, creates a new listener for
+  * those criterias and the CREATE action
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @param {Object} filters
+  *   Object used to match parameters in the body and filter messages.
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.create = function (n, fn, filters) {
@@ -286,6 +438,24 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Request
+  *
+  * Receives a route, a callback and filters, creates a new listener for
+  * those criterias and the REQUEST action
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @param {Object} filters
+  *   Object used to match parameters in the body and filter messages.
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.request = function (n, fn, filters) {
@@ -294,6 +464,24 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Subscribe
+  *
+  * Receives a route, a callback and filters, creates a new listener for
+  * those criterias and the SUBSCRIBE action
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @param {Object} filters
+  *   Object used to match parameters in the body and filter messages.
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.subscribe = function (n, fn, filters) {
@@ -302,6 +490,22 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Intercept
+  *
+  * Mirros send function. Create for more client legibility and code
+  * Maintanability
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @return {{
+  *   action: {Function} (action),
+  *   filters: {Function} (object),
+  *   bind: {Function} (context),
+  *   executeLast: {Function} ()
+  * }}
   *
   */
   Router.prototype.intercept = function (n, fn) {
@@ -310,6 +514,16 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Before Send
+  *
+  * Attachs a before send hook to a particular route.
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @return {None}
   *
   */
   Router.prototype.beforeSend = function (route, fn) {
@@ -318,6 +532,16 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name After Send
+  *
+  * Attachs a after send hook to a particular route.
+  *
+  * @function
+  * @param {String} name
+  *   Route to match
+  * @param {Function} callback
+  *   Callback to execute whenever the criterias ar meet
+  * @return {None}
   *
   */
   Router.prototype.afterSend = function (route, fn) {
@@ -326,6 +550,9 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Register Send Task
+  *
+  * Attachs a hook, by the defined criterias. (Not intended for public use yet)
   *
   */
   Router.prototype.registerSendTask = function (route, fn, position) {
@@ -338,23 +565,34 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Message
+  *
+  * Sends a message to the server. The default route is * which can be
+  * Overriten. All parameters are optional.
+  *
+  * @function
+  * @param {{
+  *   route: {String},
+  *   action: {String},
+  *   data: {Object}
+  * }} options
+  * @return {None}
   *
   */
   Router.prototype.message = function (options) {
       this.send(Object.assign({ route: "*" }, options));
-      console.log(Object.assign({ route: "*" }, options));
   }
 
 
   /*
+  * @name Apply Filters
   *
-  */
-  Router.prototype.getConnection = function () {
-      return this.connection;
-  }
-
-
-  /*
+  * Checks if an object meets the filters criteria (Not intended for public use)
+  *
+  * @function
+  * @param {Object} target_filters
+  * @param {Object} destiny_filters
+  * @return {Boolean}
   *
   */
   Router.prototype.applyFilters = function (dataFilters, eventFilters) {
@@ -371,6 +609,14 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Should Event Execute
+  *
+  * Checks if a event should execute or not (Not intended for public use)
+  *
+  * @function
+  * @param {Object} data
+  * @param {Object} evt
+  * @return {Boolean}
   *
   */
   Router.prototype.shouldEventExecute = function (data, evt) {
@@ -387,6 +633,15 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Should Task Execute
+  *
+  * Checks if a task should execute or not (Not intended for public use)
+  *
+  * @function
+  * @param {Object} data
+  * @param {Object} task
+  * @param {String} position
+  * @return {Boolean}
   *
   */
   Router.prototype.shouldTaskExecute = function (data, task, position) {
@@ -399,6 +654,14 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Apply To Queue
+  *
+  * Adds the current event to the execution queue (Not intended for public use)
+  *
+  * @function
+  * @param {Object} event
+  * @param {Array} run
+  * @return {None}
   *
   */
   Router.prototype.applyToQueue = function (evt, run) {
@@ -413,6 +676,13 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Dispatch
+  *
+  * Dispatchs the current event and the associated hooks (Not intended for public use)
+  *
+  * @function
+  * @param {Object} data
+  * @return {None}
   *
   */
   Router.prototype.dispatch = function (data) {
@@ -437,6 +707,14 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Runner
+  *
+  * Runs the provided callbacks array (Not intended for public use)
+  *
+  * @function
+  * @param {Array} run
+  * @param {Object} data
+  * @return {None}
   *
   */
   Router.prototype.runner = function (run, data) {
@@ -445,23 +723,37 @@ var WebSocketRouter = function (connection_query, ctx) {
               run [i] (data);
           }
       } catch (e) {
-          this.ExceptionHandler (e);
+          this.error(this.ExceptionHandler (e));
       }
   }
 
 
   /*
+  * @name Routify
+  *
+  * Turns a Route String into a regex (Not intended for public use)
+  *
+  * @function
+  * @param {String} route
+  * @return {Regex}
   *
   */
   Router.prototype.routify = function (n) {
       return new RegExp('^' + n
-              .replace (/\/\*/g, '*')
-              .replace (/\*/g, '.*')
+              .replace (/\*/g, '[^\/]+')
               .replace (/\//g, '\\/') + '$', '');
   }
 
 
   /*
+  * @name Error
+  *
+  * Sends an error whenever the server or the client
+  * has failed (Not intended for public use)
+  *
+  * @function
+  * @param {Error} error
+  * @return {None}
   *
   */
   Router.prototype.error = function (error) {
@@ -470,6 +762,14 @@ var WebSocketRouter = function (connection_query, ctx) {
 
 
   /*
+  * @name Execute Tasks
+  *
+  * Executes all the tasks by a hook identifier (Not intended for public use)
+  *
+  * @function
+  * @param {Object} data
+  * @param {String} position
+  * @return {None}
   *
   */
   Router.prototype.executeTaks = function (data, position) {
@@ -483,3 +783,6 @@ var WebSocketRouter = function (connection_query, ctx) {
   return new Router(connection_query, ctx);
 
 };
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
+    module.exports = WebSocketRouter;
