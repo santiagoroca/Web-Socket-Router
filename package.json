@@ -1,7 +1,7 @@
 {
   "name": "web-socket-router",
   "version": "1.4.1",
-  "description": "1.4.1",
+  "description": "1.5.0",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --verbose"
