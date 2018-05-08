@@ -4,7 +4,7 @@
   "description": "1.4.1",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --coverage --verbose"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,8 @@
     "jest": "^22.4.3",
     "mocha": "^5.1.1",
     "websocket": "^1.0.26"
+  },
+  "jest": {
+    "collectCoverage": true
   }
 }
