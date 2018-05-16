@@ -27,11 +27,14 @@ module.exports = function (connection, ctx) {
     this.LOG = function () {}
 
     if (connection.on)
-        connection.on('message', function (message) {
-          console.log(message);
-            if (message.type === 'utf8')
-                dispatch(JSON.parse(message.utf8Data));
-        });
+      connection.on('message', function (message) {
+          if (message.type === 'utf8') {
+            console.log(message);
+            dispatch(JSON.parse(message.utf8Data));
+          } else {
+            dispatch(JSON.parse(message));
+          }
+      });
     else
         connection.onmessage = function (message) {
             dispatch(JSON.parse(message.data));

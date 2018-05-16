@@ -1,6 +1,6 @@
 {
   "name": "web-socket-router",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "1.5.0",
   "main": "index.js",
   "scripts": {
