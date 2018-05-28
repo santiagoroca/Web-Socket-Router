@@ -130,7 +130,7 @@ var WebSocketRouter = function (connection_query, ctx) {
 
       // Waits for a second to make sure that,
       // if the server was down for a moment, the connecction wont fail
-      setTimeout(this.connect.bind(this), 1000);
+      setTimeout(() => this.connect(), 1000);
 
     } else {
       console.log(`10 Attemps to connect failed to the server ${this.connection_query}. Is server up?`);
