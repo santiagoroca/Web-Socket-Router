@@ -90,8 +90,8 @@ var WebSocketRouter = function WebSocketRouter(connection, ctx) {
             });
 
             connection.on('close', function (data) {
-                for (var i = 0; i < this.events.length; i++) {
-                    if (this.events[i].n == 'close') this.events[i].fn(data);
+                for (var i = 0; i < _this.events.length; i++) {
+                    if (_this.events[i].n == 'close') _this.events[i].fn(data);
                 }
             });
         } else {
@@ -100,8 +100,8 @@ var WebSocketRouter = function WebSocketRouter(connection, ctx) {
             };
 
             connection.onclose = function (data) {
-                for (var i = 0; i < this.events.length; i++) {
-                    if (this.events[i].n == 'close') this.events[i].fn(data);
+                for (var i = 0; i < _this.events.length; i++) {
+                    if (_this.events[i].n == 'close') _this.events[i].fn(data);
                 }
             };
         }
