@@ -89,14 +89,14 @@ var WebSocketRouter = function (connection, ctx) {
     if (connection.on) {
       connection.on('message', message => this.dispatch(JSON.parse(message)));
 
-      connection.on('close', function (data) {
+      connection.on('close', data => {
           for (var i = 0; i < this.events.length; i++)
               if (this.events [i].n == 'close') this.events [i].fn (data);
       });
     } else {
       connection.onmessage = message => this.dispatch(JSON.parse(message.data))
 
-      connection.onclose = function (data) {
+      connection.onclose = data => {
           for (var i = 0; i < this.events.length; i++)
               if (this.events [i].n == 'close') this.events [i].fn (data);
       }
