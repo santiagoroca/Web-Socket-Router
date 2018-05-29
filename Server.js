@@ -58,25 +58,26 @@ var WebSocketRouter = function WebSocketRouter(connection, ctx) {
     *
     */
     function Router(connection, ctx) {
+        var _this = this;
 
         if (connection.on) {
             connection.on('message', function (message) {
-                return dispatch(JSON.parse(message));
+                return _this.dispatch(JSON.parse(message));
             });
 
             connection.on('close', function (data) {
-                for (var i = 0; i < events.length; i++) {
-                    if (events[i].n == 'close') events[i].fn(data);
+                for (var i = 0; i < this.events.length; i++) {
+                    if (this.events[i].n == 'close') this.events[i].fn(data);
                 }
             });
         } else {
             connection.onmessage = function (message) {
-                return dispatch(JSON.parse(message.data));
+                return _this.dispatch(JSON.parse(message.data));
             };
 
             connection.onclose = function (data) {
-                for (var i = 0; i < events.length; i++) {
-                    if (events[i].n == 'close') events[i].fn(data);
+                for (var i = 0; i < this.events.length; i++) {
+                    if (this.events[i].n == 'close') this.events[i].fn(data);
                 }
             };
         }
