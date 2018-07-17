@@ -432,17 +432,17 @@ var WebSocketRouter = function WebSocketRouter(connection, ctx) {
     * @return {Boolean}
     *
     */
-    Router.prototype.applyFilters = function (dataFilters, eventFilters) {
+   Router.prototype.applyFilters = function (dataFilters, eventFilters) {
         var isFilterMatching = true;
 
-        Object.keys(dataFilters).forEach(function (key) {
-            if (!this.routify(eventFilters[key].toString()).exec(dataFilters[key].toString())) {
+        Object.keys(eventFilters).forEach(key => {
+            if (!this.routify(dataFilters[key].toString ()).exec(eventFilters[key].toString ())) {
                 isFilterMatching = false;
             }
         });
 
         return isFilterMatching;
-    };
+    }
 
     /*
     * @name Should Event Execute
@@ -455,17 +455,17 @@ var WebSocketRouter = function WebSocketRouter(connection, ctx) {
     * @return {Boolean}
     *
     */
-    Router.prototype.shouldEventExecute = function (data, evt) {
-        if (!this.routify(evt.action).exec(data.action)) {
+   Router.prototype.shouldEventExecute = function (data, evt) {
+        if (!this.routify (evt.action).exec(data.action)) {
             return false;
         }
 
-        if (data.filters && !evt.filters || !data.filters && evt.filters || data.filters && !applyFilters(data.filters, evt.filters)) {
-            return false;
+        if ((evt.filters && !data.data) || (data.data && evt.filters && !this.applyFilters(data.data, evt.filters))) {
+        return false;
         }
 
         return evt.n.exec(data.route);
-    };
+    }
 
     /*
     * @name Should Task Execute
